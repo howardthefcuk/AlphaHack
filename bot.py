@@ -2,24 +2,22 @@ import telebot
 import config
 from telebot import types
 import collections
+import json
 
 bot = telebot.TeleBot(config.token)
 
+with open('count.json') as data_file:    
+    countCode = json.load(data_file)
 
 class buddy:
 	def __init__(self, botik):
 		self.users = collections.defaultdict(int)
 		self.bot = botik 
 		self.welcomeMess = "Привет. Если мы встретились, значит ты хочешь рассчитать бюджет своей следующей поездки! Расскажи, куда едешь?"
-		self.polite = "О. Прекрасный выбор."
-		self.polite2 = "Тоже неплохой выбор."
-		self.food1 = "По моей информации в среднем там тратят на еду "
-		self.food2 = " евро в день на человека. Примерные минимум и максимум - "
-		self.trans1 = "Транспорт - еще "
-		self.trans2 = " евро. (мин/макс - "
-		self.enter1 = "И развлечения - "
-		self.infog = "Вот напоследок инфографика, чтобы нагляднее это все представить."
-
+		self.polite = "Хороший выбор!"
+		self.getlink = "Вот интерактивная инфографика по этой стране:\n"
+		self.next = "Какую-нибудь еще страну хочешь глянуть?"
+		self.err = "Боюсь, я не совсем тебя понял. Можешь переформулировать?"
 		
 	def getState(self, user):
 		return self.users[user]
@@ -32,8 +30,6 @@ class buddy:
 			self.users[temp] = self.actionState0(message)
 		elif self.users[temp]==1:
 			self.users[temp] = self.actionState1(message)
-		elif self.users[temp]==2:
-			self.users[temp] = self.actionState2(message)
 
 	def actionState0(self, message):
 		usid = message.chat.id
@@ -41,24 +37,22 @@ class buddy:
 		return 1
 
 	def actionState1(self, message):
-		bot.send_message(message.chat.id, self.polite)
-		bot.send_message(message.chat.id, self.food1+"30"+self.food2+"10 и 100.")
-		bot.send_message(message.chat.id, self.trans1+"10"+ self.trans2 + "2 и 40)")
-		bot.send_message(message.chat.id, self.enter1+"40, но можно как сэкономить (12), так и пошиковать (154)")
-		bot.send_message(message.chat.id, self.infog)
-		photo = open('zalupaItaly.png', 'rb')
-		bot.send_photo(message.chat.id, photo)
-		return 2
-	
-	def actionState2(self, message):
-		bot.send_message(message.chat.id, self.polite2)
-		bot.send_message(message.chat.id, self.food1+"20"+self.food2+"7 и 234.")
-		bot.send_message(message.chat.id, self.trans1+"15"+ self.trans2 + "3 и 34)")
-		bot.send_message(message.chat.id, self.enter1+"20, но можно как сэкономить (8), так и пошиковать (90)")
-		bot.send_message(message.chat.id, self.infog)
-		photo = open('zalupaGermany.png', 'rb')
-		bot.send_photo(message.chat.id, photo)
-		return 3
+		#if "какие" in message.lower():
+		#	res = ""
+		#	for i in countCode:
+		#	bot.send_message(message.chat.id, self.polite)
+		for i in countCode:
+			if i.lower() in message.text.lower():
+				code = countCode[i]
+				bot.send_message(message.chat.id, self.polite)
+				keyboard = types.InlineKeyboardMarkup()
+				url_button = types.InlineKeyboardButton(text="Перейти к инфографике", url="http://127.0.0.1:8050/"+ code)
+				keyboard.add(url_button)
+				bot.send_message(message.chat.id, self.getlink, reply_markup=keyboard)
+				bot.send_message(message.chat.id, self.next)
+				return 1
+		bot.send_message(message.chat.id, self.err)
+		return 1
 		
 
 @bot.message_handler(content_types=["text"])
