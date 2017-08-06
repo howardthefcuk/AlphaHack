@@ -10,12 +10,8 @@ app = dash.Dash()
 with open("contrCode.json") as f:
     country_codes = json.load(f)
 
-data = {
-    'RUS': {
-        "ZHRACHA": [10, 15, 20],
-        "HATA": [100, 110, 400]
-    }
-}
+with open("dataToUse.json") as f:
+    data = json.load(f)
 
 app.layout = html.Div([
     html.Div([
