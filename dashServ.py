@@ -42,6 +42,8 @@ app.layout = html.Div([
     )
 ])
 
+app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
+
 @app.callback(
     dash.dependencies.Output('indicator-graphic', 'figure'),
     [dash.dependencies.Input('url', 'pathname'),
