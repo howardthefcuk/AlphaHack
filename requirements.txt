@@ -1,6 +1,6 @@
 appnope==0.1.0
 beautifulsoup4==4.6.0
-bleach==2.0.0
+bleach==3.3.0
 click==6.7
 cycler==0.10.0
 dash==0.17.7
